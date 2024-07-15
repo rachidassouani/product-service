@@ -1,5 +1,6 @@
 package io.rachidassouani.productservice.product;
 
+import io.rachidassouani.productservice.exception.ResourceNotFoundException;
 import io.rachidassouani.productservice.rate.RateMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,14 @@ public class ProductServiceTest {
         assertThat(returnedProductResponse.getDescription()).isEqualTo(expectedProductResponse.getDescription());
         assertThat(returnedProductResponse.getPrice()).isEqualTo(expectedProductResponse.getPrice());
         verify(productRepository).findById(productId);
+    }
+
+    @Test
+    public void testFindProductByIdWhenTheresException() {
+        when(productRepository.findById(anyLong())).thenThrow(new ResourceNotFoundException(""));
+
+        // assert
+        assertThrows(ResourceNotFoundException.class, () -> productService.findProductById(1L));
     }
 
     @Test
