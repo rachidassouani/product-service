@@ -94,4 +94,31 @@ public class ProductServiceTest {
 
         verify(productRepository).save(any(Product.class));
     }
+
+    @Test
+    public void testDeleteProductWhenProductExists() {
+        Long id = 1L;
+        Product foundedProduct = new Product();
+        foundedProduct.setId(1L);
+        foundedProduct.setTitle("Test Product");
+        foundedProduct.setDescription("Test Description");
+        foundedProduct.setPrice(50.99);
+
+        when(productRepository.findById(id)).thenReturn(Optional.of(foundedProduct));
+        boolean deleted = productService.deleteProductById(id);
+
+        // assert
+        assertTrue(deleted);
+    }
+
+    @Test
+    public void testDeleteProductWhenProductNotExists() {
+        Long id = 1L;
+
+        when(productRepository.findById(id)).thenReturn(Optional.ofNullable(null));
+        boolean deleted = productService.deleteProductById(id);
+
+        // assert
+        assertFalse(deleted);
+    }
 }

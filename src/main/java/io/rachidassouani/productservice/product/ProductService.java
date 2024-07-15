@@ -29,5 +29,12 @@ public class ProductService {
         return productMapper.toProductResponse(savedProduct);
     }
 
-
+    public boolean deleteProductById(Long id) {
+        return productRepository
+                .findById(id)
+                .map(product -> {
+                    productRepository.delete(product);
+                    return true;
+                }).orElse(false);
+    }
 }
