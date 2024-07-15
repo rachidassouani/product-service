@@ -1,5 +1,6 @@
 package io.rachidassouani.productservice.product;
 
+import io.rachidassouani.productservice.exception.RequestValidationException;
 import io.rachidassouani.productservice.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,5 +37,48 @@ public class ProductService {
                     productRepository.delete(product);
                     return true;
                 }).orElse(false);
+    }
+
+    public ProductResponse updateProduct(Long id, ProductUpdateRequest productUpdateRequest) {
+        Product product = productRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Customer with id [%s] not found".formatted(id)));
+
+        /*
+         update the product only if the request body that accompanies the request contains fields
+         that are neither null nor empty and that are not equal to the existing field.
+         */
+
+        boolean changes = false;
+        if (productUpdateRequest.title() != null && !productUpdateRequest.title().isEmpty()
+                && !productUpdateRequest.title().equals(product.getTitle())) {
+            product.setTitle(productUpdateRequest.title());
+            changes = true;
+        }
+
+        if (productUpdateRequest.subtitle() != null && !productUpdateRequest.subtitle().isEmpty()
+                && !productUpdateRequest.subtitle().equals(product.getSubtitle())) {
+            product.setSubtitle(productUpdateRequest.subtitle());
+            changes = true;
+        }
+
+        if (productUpdateRequest.description() != null && !productUpdateRequest.description().isEmpty()
+                && !productUpdateRequest.description().equals(product.getDescription())) {
+            product.setDescription(productUpdateRequest.description());
+            changes = true;
+        }
+
+        if (productUpdateRequest.price() != (product.getPrice())) {
+            product.setPrice(productUpdateRequest.price());
+            changes = true;
+        }
+
+        if (!changes) {
+            throw new RequestValidationException("No data changes found");
+        }
+
+        Product savedProduct = productRepository.save(product);
+        return productMapper.toProductResponse(savedProduct);
     }
 }
