@@ -6,7 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -157,5 +163,36 @@ public class ProductServiceTest {
         assertThat(updatedProductResponse.getSubtitle()).isEqualTo(expectedUpdatedProductResponse.getSubtitle());
         assertThat(updatedProductResponse.getDescription()).isEqualTo(expectedUpdatedProductResponse.getDescription());
         assertThat(updatedProductResponse.getPrice()).isEqualTo(expectedUpdatedProductResponse.getPrice());
+    }
+
+    @Test
+    public void testFindAllProductsByPageAndSize() {
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setTitle("Test Product");
+        product1.setDescription("Test Description");
+        product1.setPrice(50.99);
+
+        Product product2 = new Product();
+        product2.setId(1L);
+        product2.setTitle("Test Product");
+        product2.setDescription("Test Description");
+        product2.setPrice(50.99);
+
+        List<Product> products = new ArrayList<>();
+        products.add(product1);
+        products.add(product2);
+
+        int page = 0;
+        int size = 2;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> productPage = new PageImpl<>(products, pageable, products.size());
+
+        when(productRepository.findAll(pageable)).thenReturn(productPage);
+        List<ProductResponse> allProductsByPageAndSize = productService
+                .findAllProductsByPageAndSize(page, size);
+
+        assertThat(allProductsByPageAndSize).isNotNull();
+        assertThat(allProductsByPageAndSize).size().isEqualTo(size);
     }
 }

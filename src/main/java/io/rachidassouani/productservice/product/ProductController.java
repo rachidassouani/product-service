@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/products")
 public class ProductController {
@@ -42,4 +44,14 @@ public class ProductController {
         ProductResponse productResponse = productService.updateProduct(id, productUpdateRequest);
         return ResponseEntity.ok("Product with id [%s] updated successfully".formatted(id));
     }
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> findAllProductsByPageAndSize(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size) {
+        List<ProductResponse> allProductsByPageAndSize = productService
+                .findAllProductsByPageAndSize(page, size);
+        return ResponseEntity.ok(allProductsByPageAndSize);
+    }
+
 }

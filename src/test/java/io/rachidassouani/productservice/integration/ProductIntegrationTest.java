@@ -194,4 +194,38 @@ public class ProductIntegrationTest {
         assertThat(updateRequest.description()).isEqualTo(findUpdatedproductResponse.getDescription());
         assertThat(updateRequest.price()).isEqualTo(findUpdatedproductResponse.getPrice());
     }
+
+    @Test
+    public void testFindAllProductsByPageAndSize() {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setTitle("title integration");
+        productRequest.setSubtitle("subtitle integration");
+        productRequest.setDescription("description integration");
+        productRequest.setPrice(66);
+
+        ProductResponse savedProduct = webTestClient.post()
+                .uri(PRODUCT_PATH)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(productRequest), ProductRequest.class)
+                .exchange().expectStatus().isCreated()
+                .expectBody(new ParameterizedTypeReference<ProductResponse>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        List<ProductResponse> productResponses = webTestClient.get()
+                .uri(PRODUCT_PATH)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(new ParameterizedTypeReference<ProductResponse>() {})
+                .returnResult()
+                .getResponseBody();
+
+
+        //Assert
+        assertThat(productResponses).isNotNull();
+        assertThat(productResponses.size()).isLessThan(11);
+    }
 }
