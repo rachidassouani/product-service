@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,5 +58,40 @@ public class ProductServiceTest {
         assertThat(returnedProductResponse.getDescription()).isEqualTo(expectedProductResponse.getDescription());
         assertThat(returnedProductResponse.getPrice()).isEqualTo(expectedProductResponse.getPrice());
         verify(productRepository).findById(productId);
+    }
+
+    @Test
+    public void testSaveProduct() {
+        // product to save
+        ProductRequest productToSave = new ProductRequest();
+        productToSave.setId(1L);
+        productToSave.setTitle("Test Product");
+        productToSave.setDescription("Test Description");
+        productToSave.setPrice(50.99);
+
+        Product savedProduct = new Product();
+        savedProduct.setId(1L);
+        savedProduct.setTitle("Test Product");
+        savedProduct.setDescription("Test Description");
+        savedProduct.setPrice(50.99);
+
+        // saved product
+        ProductResponse expectedProductResponse = new ProductResponse();
+        expectedProductResponse.setId(1L);
+        expectedProductResponse.setTitle("Test Product");
+        expectedProductResponse.setDescription("Test Description");
+        expectedProductResponse.setPrice(50.99);
+
+        when(productRepository.save(any())).thenReturn(savedProduct);
+        ProductResponse savedProductResponse = productService.saveProduct(productToSave);
+
+        // Assert
+        assertNotNull(savedProductResponse);
+        assertEquals(expectedProductResponse.getId(), savedProductResponse.getId());
+        assertEquals(expectedProductResponse.getTitle(), savedProductResponse.getTitle());
+        assertEquals(expectedProductResponse.getDescription(), savedProductResponse.getDescription());
+        assertEquals(expectedProductResponse.getPrice(), savedProductResponse.getPrice());
+
+        verify(productRepository).save(any(Product.class));
     }
 }
