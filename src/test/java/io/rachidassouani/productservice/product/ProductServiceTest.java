@@ -121,4 +121,41 @@ public class ProductServiceTest {
         // assert
         assertFalse(deleted);
     }
+
+
+    @Test
+    public void testUpdateAllProductProperties() {
+        Long id = 1L;
+        Product productToUpdate = new Product();
+        productToUpdate.setId(1L);
+        productToUpdate.setTitle("Test Product");
+        productToUpdate.setDescription("Test Description");
+        productToUpdate.setPrice(50.99);
+
+        ProductUpdateRequest updateRequest = new ProductUpdateRequest(
+                "new title",
+                "new subtitle",
+                50,
+                "new description");
+
+        Product expectedUpdatedProduct = new Product();
+        expectedUpdatedProduct.setId(id);
+        expectedUpdatedProduct.setTitle("new title");
+        expectedUpdatedProduct.setTitle("new subtitle");
+        expectedUpdatedProduct.setPrice(50);
+        expectedUpdatedProduct.setDescription("new description");
+        ProductResponse expectedUpdatedProductResponse = productMapper
+                .toProductResponse(expectedUpdatedProduct);
+
+        when(productRepository.findById(id)).thenReturn(Optional.of(productToUpdate));
+        when(productRepository.save(any())).thenReturn(expectedUpdatedProduct);
+        ProductResponse updatedProductResponse = productService.updateProduct(id, updateRequest);
+
+        // assert
+        assertThat(updatedProductResponse.getId()).isEqualTo(expectedUpdatedProductResponse.getId());
+        assertThat(updatedProductResponse.getTitle()).isEqualTo(expectedUpdatedProductResponse.getTitle());
+        assertThat(updatedProductResponse.getSubtitle()).isEqualTo(expectedUpdatedProductResponse.getSubtitle());
+        assertThat(updatedProductResponse.getDescription()).isEqualTo(expectedUpdatedProductResponse.getDescription());
+        assertThat(updatedProductResponse.getPrice()).isEqualTo(expectedUpdatedProductResponse.getPrice());
+    }
 }
