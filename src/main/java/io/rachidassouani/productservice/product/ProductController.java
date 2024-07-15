@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,8 @@ import java.util.List;
 @Tag(name = "Product", description = "Product management APIs")
 public class ProductController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
     private final ProductService productService;
 
     public ProductController(ProductService productService) {
@@ -25,6 +29,7 @@ public class ProductController {
     @GetMapping("{id}")
     @Operation(summary = "Find product by ID", description = "Returns a product based on ID")
     public ResponseEntity<?> findProductById(@PathVariable("id") Long id) {
+        logger.info("Received request to find product with ID: {}", id);
         ProductResponse productById = productService.findProductById(id);
         return ResponseEntity.ok(productById);
     }
@@ -36,6 +41,7 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
     public ResponseEntity<?> saveProduct(@RequestBody @Valid ProductRequest productRequest) {
+        logger.info("Received request to save product");
         ProductResponse productResponse = productService.saveProduct(productRequest);
         return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
     }
@@ -47,9 +53,11 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Product to delete not found")
     })
     public ResponseEntity<?> deleteProductById(@PathVariable("id") Long id) {
+        logger.info("Received request to delete product with ID: {}", id);
         if (productService.deleteProductById(id)) {
             return ResponseEntity.ok("Product with id [%s] deleted successfully".formatted(id));
         }
+        logger.warn("Cannot delete product with ID: {}, because its not founded", id);
         return new ResponseEntity<>("Product with id [%s] not found".formatted(id), HttpStatus.NOT_FOUND);
     }
 
@@ -62,6 +70,7 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(
             @PathVariable("id") Long id,
             @RequestBody @Valid ProductUpdateRequest productUpdateRequest) {
+        logger.info("Received request to update product with ID: {}", id);
         ProductResponse productResponse = productService.updateProduct(id, productUpdateRequest);
         return ResponseEntity.ok("Product with id [%s] updated successfully".formatted(id));
     }
@@ -74,6 +83,7 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> findAllProductsByPageAndSize(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size) {
+        logger.info("Received request to find all  products by page and size");
         List<ProductResponse> allProductsByPageAndSize = productService
                 .findAllProductsByPageAndSize(page, size);
         return ResponseEntity.ok(allProductsByPageAndSize);
