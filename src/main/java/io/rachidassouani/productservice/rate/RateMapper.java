@@ -13,4 +13,12 @@ public class RateMapper {
         rateResponse.setNumberOfStarts(rate.getNumberOfStarts());
         return rateResponse;
     }
+
+    public Rate toRate(RateRequest rateRequest) {
+        Rate rate = new Rate();
+        rate.setTitle(rateRequest.title());
+        rate.setComment(rateRequest.comment());
+        rate.setNumberOfStarts(rateRequest.numberOfStarts());
+        return rate;
+    }
 }

@@ -22,4 +22,12 @@ public class ProductService {
                 .orElseThrow(()
                         -> new ResourceNotFoundException("Product with id [%s] not found".formatted(id)));
     }
+
+    public ProductResponse saveProduct(ProductRequest productRequest) {
+        Product productToSave = productMapper.toProduct(productRequest);
+        Product savedProduct = productRepository.save(productToSave);
+        return productMapper.toProductResponse(savedProduct);
+    }
+
+
 }

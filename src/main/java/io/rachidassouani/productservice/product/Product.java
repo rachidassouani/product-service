@@ -24,7 +24,7 @@ public class Product {
     @Column(name = "description", length = 1000)
     private String description;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     private List<Rate> rates;
 
     public Long getId() {
